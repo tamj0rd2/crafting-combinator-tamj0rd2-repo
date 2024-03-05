@@ -1,8 +1,6 @@
 {
-  "name": "tamj0rd2-crafting-combinator",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "crafting-combinator-tamj0rd2",
+  "private": true,
   "scripts": {
     "build": "tstl",
     "dev": "tstl --watch",

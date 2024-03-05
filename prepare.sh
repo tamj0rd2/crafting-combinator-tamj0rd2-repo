@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-mod_dir="../tamj0rd2-crafting-combinator"
+mod_dir="../crafting-combinator-tamj0rd2"
 
 rm -rf "${mod_dir}"
 npm run build
