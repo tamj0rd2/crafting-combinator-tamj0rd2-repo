@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TypeScriptToLua/TypeScriptToLua/master/tsconfig-schema.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "lib": [
+      "ESNext"
+    ],
+    "moduleResolution": "Node",
+    "types": [
+      "typed-factorio/prototype",
+      "typed-factorio/runtime",
+      "typed-factorio/settings",
+      "factorio-test",
+      "luassert-tstl"
+    ],
+    "strict": true,
+    "outDir": "../tamj0rd2-crafting-combinator",
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "tstl": {
+    "luaTarget": "5.2",
+    "noHeader": true,
+    "luaLibImport": "require",
+    "noResolvePaths": ["__factorio-test__.init"]
+    // "sourceMapTraceback": true
+  }
+}

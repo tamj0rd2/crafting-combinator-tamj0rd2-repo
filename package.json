@@ -1,0 +1,24 @@
+{
+  "name": "tamj0rd2-crafting-combinator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tstl",
+    "dev": "tstl --watch",
+    "lint": "eslint --ext .ts src --fix"
+  },
+  "author": "tamj0rd2",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
+    "factorio-test": "^1.1.0",
+    "factorio-test-cli": "^1.0.5",
+    "luassert-tstl": "^0.3.0",
+    "typed-factorio": "^2.7.4",
+    "typescript": "^5.3.3",
+    "typescript-to-lua": "^1.24.1"
+  }
+}

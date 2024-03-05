@@ -1,0 +1,11 @@
+{
+  "name": "tamj0rd2-crafting-combinator",
+  "version": "0.1.0",
+  "title": "Fire Armor",
+  "author": "tamj0rd2",
+  "factorio_version": "1.1",
+  "dependencies": [
+    "base >= 1.1"
+  ],
+  "description": "This mod adds in fire armor that leaves behind damaging fire as you walk around."
+}
