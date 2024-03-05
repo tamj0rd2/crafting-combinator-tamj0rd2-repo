@@ -15,7 +15,7 @@
       "luassert-tstl"
     ],
     "strict": true,
-    "outDir": "../tamj0rd2-crafting-combinator",
+    "outDir": ".release",
   },
   "include": [
     "src/**/*"
