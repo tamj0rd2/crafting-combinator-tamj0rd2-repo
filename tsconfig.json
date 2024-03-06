@@ -23,8 +23,8 @@
   "tstl": {
     "luaTarget": "5.2",
     "noHeader": true,
-    "luaLibImport": "require",
-    "noResolvePaths": ["__factorio-test__.init"]
-    // "sourceMapTraceback": true
+    "luaLibImport": "require-minimal",
+    "noResolvePaths": ["__factorio-test__.init"],
+     "sourceMapTraceback": true
   }
 }
