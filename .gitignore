@@ -2,3 +2,4 @@ node_modules/
 .run
 .release
 .factorio-test-data
+.envrc
