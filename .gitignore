@@ -4,3 +4,4 @@ node_modules/
 .factorio-test-data
 .envrc
 .idea
+.vscode/
