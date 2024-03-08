@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+import init = require("__factorio-test__/init");
 
 if (script.active_mods["factorio-test"]) {
-	/** @noSelf **/
-	const init: (files: string[]) => unknown = require("__factorio-test__.init")
-	init(["smoke-test"])
+	init(["smoke-test"], {
+		default_timeout: 60 * 5,
+		log_passed_tests: false,
+	})
 }
