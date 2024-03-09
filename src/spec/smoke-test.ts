@@ -68,6 +68,7 @@ describe("basic crafting combinator functionality", () => {
 		const constantCombinatorCb = constantCombinator.get_or_create_control_behavior() as LuaConstantCombinatorControlBehavior
 		return {
 			craftingCombinator,
+			// TODO: this makes me want to build my own abstraction on top of these entities
 			setConstantCombinatorSignal: (signal: SignalID) => constantCombinatorCb.parameters = [{count: 1, index: 1, signal: signal}],
 			assertAssemblingMachineRecipe: (expectedRecipe: string) => assert.equal(expectedRecipe, assemblingMachine.get_recipe()?.name)
 		}
