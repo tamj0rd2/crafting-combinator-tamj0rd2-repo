@@ -15,13 +15,13 @@ script.on_nth_tick(60, () => {
 
 		const assemblingMachine = assemblingMachines[0]
 
-		// TODO: I should make sure the assembling machine is able to produce this kind of item
 		const itemToCraft = combinatorControlBehaviour.parameters.output_signal?.name
 		if (!itemToCraft) return
 
 		const recipe = combinatorControlBehaviour.entity.force.recipes[itemToCraft]
 		if (!recipe) return
 
+		// TODO: I should make sure the assembling machine is able to produce this kind of item
 		assemblingMachine.set_recipe(recipe)
 	})
 })
