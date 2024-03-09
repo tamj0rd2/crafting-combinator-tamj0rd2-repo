@@ -30,11 +30,11 @@ describe("basic crafting combinator functionality", () => {
 
 		perform([
 			{
-				action: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
+				act: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
 				assert: () => assertAssemblingMachineRecipe("pipe")
 			},
 			{
-				action: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
+				act: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
 				assert: () => assertAssemblingMachineRecipe("iron-stick")
 			}
 		])
@@ -69,7 +69,11 @@ describe("basic crafting combinator functionality", () => {
 		return {
 			craftingCombinator,
 			// TODO: this makes me want to build my own abstraction on top of these entities
-			setConstantCombinatorSignal: (signal: SignalID) => constantCombinatorCb.parameters = [{count: 1, index: 1, signal: signal}],
+			setConstantCombinatorSignal: (signal: SignalID) => constantCombinatorCb.parameters = [{
+				count: 1,
+				index: 1,
+				signal: signal
+			}],
 			assertAssemblingMachineRecipe: (expectedRecipe: string) => assert.equal(expectedRecipe, assemblingMachine.get_recipe()?.name)
 		}
 	}
