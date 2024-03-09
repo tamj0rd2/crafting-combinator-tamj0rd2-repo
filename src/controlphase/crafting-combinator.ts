@@ -1,4 +1,4 @@
-import {LuaArithmeticCombinatorControlBehavior, LuaEntity} from "factorio:runtime"
+import {LuaArithmeticCombinatorControlBehavior, LuaEntity, Signal} from "factorio:runtime"
 import {CRAFTING_COMBINATOR} from "../constants"
 
 script.on_nth_tick(60, () => {
@@ -14,14 +14,18 @@ script.on_nth_tick(60, () => {
 		}
 
 		const assemblingMachine = assemblingMachines[0]
+		assemblingMachine.prototype.crafting_categories
 
-		const itemToCraft = combinatorControlBehaviour.parameters.output_signal?.name
-		if (!itemToCraft) return
+		const networkSignals = [
+			...combinatorControlBehaviour.get_circuit_network(defines.wire_type.red, defines.circuit_connector_id.combinator_input)?.signals || [],
+			...combinatorControlBehaviour.get_circuit_network(defines.wire_type.green, defines.circuit_connector_id.combinator_input)?.signals || []
+		]
 
-		const recipe = combinatorControlBehaviour.entity.force.recipes[itemToCraft]
+		const recipe = chooseRecipeToCraft(assemblingMachine, networkSignals)
 		if (!recipe) return
 
-		// TODO: I should make sure the assembling machine is able to produce this kind of item
+		// TODO: what to do with any input items and output items currently inside of the assembling machine?
+		// TODO: I should let the assembling machine finish crafting before allowing the recipe to change.
 		assemblingMachine.set_recipe(recipe)
 	})
 })
@@ -41,4 +45,12 @@ function findAssemblingMachinesNear(combinator: LuaEntity): LuaEntity[] {
 		radius: 3,
 		type: "assembling-machine"
 	})
+}
+
+function chooseRecipeToCraft(assemblingMachine: LuaEntity, networkSignals: Signal[]) {
+	// TODO: I should make sure the assembling machine is able to produce this kind of recipe
+	const thingToCraft = networkSignals[0].signal.name
+	if (!thingToCraft) return
+
+	return assemblingMachine.force.recipes[thingToCraft]
 }

@@ -1,12 +1,12 @@
 import {CRAFTING_COMBINATOR} from "../constants"
-import {LuaArithmeticCombinatorControlBehavior, LuaEntity, LuaSurface, SurfaceCreateEntity} from "factorio:runtime"
-
+import {LuaConstantCombinatorControlBehavior, LuaSurface, SignalID, SurfaceCreateEntity} from "factorio:runtime"
+import {async} from "./async"
 
 describe("basic crafting combinator functionality", () => {
-	const createdEntities: LuaEntity[] = []
 	const nauvis = () => game.surfaces[1]
 	const player = () => game.players[1]
 	const force = () => game.forces.player
+	const entitiesForTesting = ["assembling-machine-1", CRAFTING_COMBINATOR, "constant-combinator"]
 
 	before_all(() => {
 		nauvis().always_day = true
@@ -14,29 +14,28 @@ describe("basic crafting combinator functionality", () => {
 		player().force.research_all_technologies()
 	})
 
-	after_each(() => {
-		createdEntities.forEach(entity => {
-			assert(entity.destroy({raise_destroy: true}))
-		})
-		createdEntities.length = 0
-	})
-
-	test("can set the recipe of an assembling machine using the crafting combinator", () => {
-		const { assemblingMachine, craftingCombinator } = setupTestEntities()
-
-		const combinatorControlBehaviour = craftingCombinator.get_or_create_control_behavior() as LuaArithmeticCombinatorControlBehavior
-		combinatorControlBehaviour.parameters = {
-			...combinatorControlBehaviour.parameters,
-			output_signal: {type: "item", name: "pipe"},
-		}
-
-		after_ticks(60, () => {
-			// this is brittle, but it gives better test output than async + on_tick
-			assert.equal("pipe", assemblingMachine.get_recipe()?.name)
+	before_each(() => {
+		nauvis().find_entities().forEach(entity => {
+			if (entitiesForTesting.includes(entity.name)) {
+				entity.destroy({raise_destroy: true})
+			}
 		})
 	})
 
-	function setupTestEntities() {
+	test("can set the recipe of an assembling machine using a crafting combinator with an incoming signal", () => {
+		const {
+			setConstantCombinatorSignal,
+			assertAssemblingMachineRecipe,
+		} = setupTestingArea()
+
+		setConstantCombinatorSignal({type: "item", name: "pipe"})
+		async(() => assertAssemblingMachineRecipe("pipe"))
+			.thenImmediately(() => setConstantCombinatorSignal({type: "item", name: "iron-stick"}))
+			.thenEventually(() => assertAssemblingMachineRecipe("iron-stick"))
+			.run()
+	})
+
+	function setupTestingArea() {
 		const assemblingMachine = createEntity(nauvis(), {
 			name: "assembling-machine-1",
 			position: {x: 0, y: 0},
@@ -49,16 +48,33 @@ describe("basic crafting combinator functionality", () => {
 			force: force()
 		})
 
+		const constantCombinator = createEntity(nauvis(), {
+			name: "constant-combinator",
+			position: {x: craftingCombinator.position.x + 0, y: craftingCombinator.position.y + 1},
+			force: force()
+		})
+
+		constantCombinator.connect_neighbour({
+			wire: defines.wire_type.red,
+			target_entity: craftingCombinator,
+			target_circuit_id: defines.circuit_connector_id.combinator_input
+		})
+
+		const constantCombinatorCb = constantCombinator.get_or_create_control_behavior() as LuaConstantCombinatorControlBehavior
 		return {
-			assemblingMachine,
 			craftingCombinator,
+			setConstantCombinatorSignal: (signal: SignalID) => constantCombinatorCb.parameters = [{count: 1, index: 1, signal: signal}],
+			assertAssemblingMachineRecipe: (expectedRecipe: string) => assert.equal(expectedRecipe, assemblingMachine.get_recipe()?.name)
 		}
 	}
 
 	function createEntity(surface: LuaSurface, params: SurfaceCreateEntity) {
+		if (params.name ! in entitiesForTesting) {
+			throw Error(`Add ${params.name} to entitiesForTesting to allow creating/deleting it in tests.`)
+		}
+
 		const entity = assert(surface.create_entity(params))
 		assert.truthy(entity.valid)
-		createdEntities.push(entity)
 		return entity
 	}
 })
