@@ -48,6 +48,8 @@ function findAssemblingMachinesNear(combinator: LuaEntity): LuaEntity[] {
 }
 
 function chooseRecipeToCraft(assemblingMachine: LuaEntity, networkSignals: Signal[]) {
+	if (networkSignals.length === 0) return
+
 	// TODO: I should make sure the assembling machine is able to produce this kind of recipe
 	const thingToCraft = networkSignals[0].signal.name
 	if (!thingToCraft) return

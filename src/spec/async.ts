@@ -4,7 +4,7 @@ interface Async {
 	run: () => void
 }
 
-export function async(fn: () => void): Async {
+function async(fn: () => void = () => null): Async {
 	const oneSecond = 60
 
 	return {
@@ -28,4 +28,17 @@ export function async(fn: () => void): Async {
 			})
 		},
 	}
+}
+
+interface AsyncStep {
+	action: () => void
+	assert?: () => void
+}
+
+// runs the steps in sequence
+export function perform(steps: AsyncStep[]): void {
+	steps.reduce((queue, {action, assert}) => {
+		if (!assert) return queue.thenImmediately(action)
+		return queue.thenImmediately(action).thenEventually(assert)
+	}, async()).run()
 }

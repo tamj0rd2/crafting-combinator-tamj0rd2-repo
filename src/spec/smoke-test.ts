@@ -1,6 +1,6 @@
 import {CRAFTING_COMBINATOR} from "../constants"
 import {LuaConstantCombinatorControlBehavior, LuaSurface, SignalID, SurfaceCreateEntity} from "factorio:runtime"
-import {async} from "./async"
+import {perform} from "./async"
 
 describe("basic crafting combinator functionality", () => {
 	const nauvis = () => game.surfaces[1]
@@ -28,11 +28,16 @@ describe("basic crafting combinator functionality", () => {
 			assertAssemblingMachineRecipe,
 		} = setupTestingArea()
 
-		setConstantCombinatorSignal({type: "item", name: "pipe"})
-		async(() => assertAssemblingMachineRecipe("pipe"))
-			.thenImmediately(() => setConstantCombinatorSignal({type: "item", name: "iron-stick"}))
-			.thenEventually(() => assertAssemblingMachineRecipe("iron-stick"))
-			.run()
+		perform([
+			{
+				action: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
+				assert: () => assertAssemblingMachineRecipe("pipe")
+			},
+			{
+				action: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
+				assert: () => assertAssemblingMachineRecipe("iron-stick")
+			}
+		])
 	})
 
 	function setupTestingArea() {
