@@ -1,7 +1,12 @@
-import {CraftingCombinator, CraftingCombinators} from "./entities/crafting-combinator"
+import {CraftingCombinator, CraftingCombinatorOutput, CraftingCombinators} from "./entities/crafting-combinator"
 import {CRAFTING_COMBINATOR} from "../constants"
 
-const customTypes = [CraftingCombinators, CraftingCombinator]
+const customTypes = [
+	CraftingCombinators,
+	CraftingCombinator,
+	CraftingCombinatorOutput
+]
+
 customTypes.forEach((customType) => {
 	script.register_metatable(customType.name, customType)
 })

@@ -13,7 +13,12 @@ describe("basic crafting combinator functionality", () => {
 	const nauvis = () => game.surfaces[1]
 	const player = () => game.players[1]
 	const force = () => game.forces.player
-	const entitiesForTesting = ["assembling-machine-1", CRAFTING_COMBINATOR, "constant-combinator"]
+	const entitiesForTesting = [
+		"assembling-machine-1",
+		CRAFTING_COMBINATOR,
+		"constant-combinator",
+		"small-electric-pole",
+	]
 
 	before_all(() => {
 		nauvis().always_day = true
@@ -34,6 +39,7 @@ describe("basic crafting combinator functionality", () => {
 			craftingCombinator,
 			setConstantCombinatorSignal,
 			assertAssemblingMachineRecipe,
+			assertElectricPoleSignal,
 		} = setupTestingArea()
 
 		perform([
@@ -42,6 +48,7 @@ describe("basic crafting combinator functionality", () => {
 				assert: () => {
 					assert.equal("pipe", craftingCombinator.recipe?.name)
 					assertAssemblingMachineRecipe("pipe")
+					assertElectricPoleSignal("pipe")
 				}
 			},
 			{
@@ -49,6 +56,7 @@ describe("basic crafting combinator functionality", () => {
 				assert: () => {
 					assert.equal("iron-stick", craftingCombinator.recipe?.name)
 					assertAssemblingMachineRecipe("iron-stick")
+					assertElectricPoleSignal("iron-stick")
 				}
 			}
 		])
@@ -65,6 +73,18 @@ describe("basic crafting combinator functionality", () => {
 		const craftingCombinator = CraftingCombinators.create(nauvis(), {
 			position: translatePositionOf(assemblingMachine, 2, -1),
 			force: force(),
+		})
+
+		const smallElectricPole = createEntity(nauvis(), {
+			name: "small-electric-pole",
+			position: translatePositionOf(craftingCombinator.entity, 0, -2),
+			force: force(),
+			raise_built: true,
+		})
+		smallElectricPole.connect_neighbour({
+			wire: defines.wire_type.green,
+			target_entity: craftingCombinator.entity,
+			target_circuit_id: defines.circuit_connector_id.combinator_output
 		})
 
 		const constantCombinator = createEntity(nauvis(), {
@@ -89,7 +109,11 @@ describe("basic crafting combinator functionality", () => {
 				index: 1,
 				signal: signal
 			}],
-			assertAssemblingMachineRecipe: (expectedRecipe: string) => assert.equal(expectedRecipe, assemblingMachine.get_recipe()?.name)
+			assertAssemblingMachineRecipe: (expectedRecipe: string) => assert.equal(expectedRecipe, assemblingMachine.get_recipe()?.name),
+			assertElectricPoleSignal: (expectedSignalName: string) => {
+				const circuitNetwork = assert(smallElectricPole.get_circuit_network(defines.wire_type.green))
+				assert.equal(expectedSignalName, circuitNetwork.signals?.[0]?.signal?.name)
+			}
 		}
 	}
 

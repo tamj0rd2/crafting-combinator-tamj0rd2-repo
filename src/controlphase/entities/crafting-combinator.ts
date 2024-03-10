@@ -1,5 +1,13 @@
-import {LuaEntity, LuaRecipe, LuaSurface, SurfaceCreateEntity, UnitNumber} from "factorio:runtime"
-import {CRAFTING_COMBINATOR} from "../../constants"
+import {
+	LuaConstantCombinatorControlBehavior,
+	LuaEntity,
+	LuaRecipe,
+	LuaSurface,
+	SignalID,
+	SurfaceCreateEntity,
+	UnitNumber
+} from "factorio:runtime"
+import {CRAFTING_COMBINATOR, CRAFTING_COMBINATOR_OUTPUT} from "../../constants"
 
 declare const global: {
 	craftingCombinators: Record<UnitNumber, CraftingCombinator>
@@ -23,6 +31,7 @@ export class CraftingCombinators {
 			...params, name: CRAFTING_COMBINATOR,
 			raise_built: true
 		}))
+		assert(entity.valid)
 		return this.craftingCombinators[assert(entity.unit_number)]
 	}
 
@@ -37,8 +46,15 @@ export class CraftingCombinator {
 	constructor(readonly entity: LuaEntity) {
 		assert(entity.name === CRAFTING_COMBINATOR, "entity must be a crafting combinator")
 		assert(entity.valid, "entity must be valid")
+
+		this._output = new CraftingCombinatorOutput(assert(entity.surface.create_entity({
+			name: CRAFTING_COMBINATOR_OUTPUT,
+			position: entity.position,
+			force: entity.force
+		})), this)
 	}
 
+	private _output: CraftingCombinatorOutput
 	private _recipe?: LuaRecipe = undefined
 	public get recipe(): LuaRecipe | undefined {
 		return this._recipe
@@ -71,6 +87,8 @@ export class CraftingCombinator {
 		// TODO: what to do with any input items and output items currently inside of the assembling machine?
 		// TODO: I should let the assembling machine finish crafting before allowing the recipe to change.
 		assemblingMachine.set_recipe(recipe)
+		// TODO: don't hardcode item here. I think chemical plants count as crafting machines.
+		this._output.setSignal({type: "item", name: recipe?.name}, 1)
 	}
 
 	private chooseARecipeToCraftFor = (otherEntity: LuaEntity) => {
@@ -87,5 +105,25 @@ export class CraftingCombinator {
 		if (thingToCraft === undefined) return
 
 		return otherEntity.force.recipes[thingToCraft]
+	}
+}
+
+export class CraftingCombinatorOutput {
+	constructor(readonly entity: LuaEntity, parent: CraftingCombinator) {
+		assert(entity.name === CRAFTING_COMBINATOR_OUTPUT, "entity must be a crafting combinator output")
+		assert(entity.valid, "entity must be valid")
+
+		;[defines.wire_type.green, defines.wire_type.red].forEach(wireType => {
+			entity.connect_neighbour({
+				wire: wireType,
+				target_entity: parent.entity,
+				target_circuit_id: defines.circuit_connector_id.combinator_output
+			})
+		})
+	}
+
+	setSignal = (signal: SignalID, count: number) => {
+		const cb = this.entity.get_or_create_control_behavior()! as LuaConstantCombinatorControlBehavior
+		cb.parameters = [{index: 1, signal, count}]
 	}
 }
