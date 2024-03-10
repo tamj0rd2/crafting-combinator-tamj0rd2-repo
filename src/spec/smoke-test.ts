@@ -1,6 +1,13 @@
 import {CRAFTING_COMBINATOR} from "../constants"
-import {LuaConstantCombinatorControlBehavior, LuaSurface, SignalID, SurfaceCreateEntity} from "factorio:runtime"
+import {
+	LuaConstantCombinatorControlBehavior,
+	LuaEntity,
+	LuaSurface,
+	SignalID,
+	SurfaceCreateEntity
+} from "factorio:runtime"
 import {perform} from "./async"
+import {CraftingCombinators} from "../controlphase/entities/crafting-combinator"
 
 describe("basic crafting combinator functionality", () => {
 	const nauvis = () => game.surfaces[1]
@@ -24,6 +31,7 @@ describe("basic crafting combinator functionality", () => {
 
 	test("can set the recipe of an assembling machine using a crafting combinator with an incoming signal", () => {
 		const {
+			craftingCombinator,
 			setConstantCombinatorSignal,
 			assertAssemblingMachineRecipe,
 		} = setupTestingArea()
@@ -31,11 +39,17 @@ describe("basic crafting combinator functionality", () => {
 		perform([
 			{
 				act: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
-				assert: () => assertAssemblingMachineRecipe("pipe")
+				assert: () => {
+					assert.equal("pipe", craftingCombinator.recipe?.name)
+					assertAssemblingMachineRecipe("pipe")
+				}
 			},
 			{
 				act: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
-				assert: () => assertAssemblingMachineRecipe("iron-stick")
+				assert: () => {
+					assert.equal("iron-stick", craftingCombinator.recipe?.name)
+					assertAssemblingMachineRecipe("iron-stick")
+				}
 			}
 		])
 	})
@@ -44,24 +58,25 @@ describe("basic crafting combinator functionality", () => {
 		const assemblingMachine = createEntity(nauvis(), {
 			name: "assembling-machine-1",
 			position: {x: 0, y: 0},
-			force: force()
+			force: force(),
+			raise_built: true,
 		})
 
-		const craftingCombinator = createEntity(nauvis(), {
-			name: CRAFTING_COMBINATOR,
-			position: {x: assemblingMachine.position.x + 2, y: assemblingMachine.position.y - 1},
-			force: force()
+		const craftingCombinator = CraftingCombinators.create(nauvis(), {
+			position: translatePositionOf(assemblingMachine, 2, -1),
+			force: force(),
 		})
 
 		const constantCombinator = createEntity(nauvis(), {
 			name: "constant-combinator",
-			position: {x: craftingCombinator.position.x + 0, y: craftingCombinator.position.y + 1},
-			force: force()
+			position: translatePositionOf(craftingCombinator.entity, 0, 1),
+			force: force(),
+			raise_built: true,
 		})
 
 		constantCombinator.connect_neighbour({
 			wire: defines.wire_type.red,
-			target_entity: craftingCombinator,
+			target_entity: craftingCombinator.entity,
 			target_circuit_id: defines.circuit_connector_id.combinator_input
 		})
 
@@ -88,3 +103,7 @@ describe("basic crafting combinator functionality", () => {
 		return entity
 	}
 })
+
+function translatePositionOf(entity: LuaEntity, x: number, y: number) {
+	return {x: entity.position.x + x, y: entity.position.y + y}
+}

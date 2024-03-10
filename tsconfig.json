@@ -18,14 +18,14 @@
         "outDir": ".release"
     },
     "include": [
-        "src/**/*"
+        "src/**/*.ts"
     ],
     "tstl": {
         "luaTarget": "5.2",
         "noHeader": true,
         "luaLibImport": "require-minimal",
         "noResolvePaths": [
-            "__factorio-test__.init"
+            "__factorio-test__.init",
         ],
         "noImplicitSelf": true,
         "sourceMapTraceback": true

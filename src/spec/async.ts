@@ -7,7 +7,7 @@ interface AsyncStep {
 export function perform(steps: AsyncStep[]): void {
 	function fnForStep(stepIndex: number): () => void {
 		if (stepIndex >= steps.length) {
-			return () => null
+			return () => undefined
 		}
 
 		const { act, assert } = steps[stepIndex]

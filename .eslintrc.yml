@@ -8,6 +8,7 @@ extends:
 parser: '@typescript-eslint/parser'
 parserOptions:
   ecmaVersion: latest
+  project: ./tsconfig.json
 plugins:
   - '@typescript-eslint'
   - 'only-warn'
@@ -24,3 +25,4 @@ rules:
   semi:
     - error
     - never
+  "@typescript-eslint/strict-boolean-expressions": "error"
