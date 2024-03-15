@@ -2,8 +2,8 @@
   "name": "crafting-combinator-tamj0rd2",
   "private": true,
   "scripts": {
-    "build": "tstl",
-    "dev": "tstl --watch",
+    "build": "tsc -p ./plugins/tsconfig.json && tstl -p ./mod/tsconfig.json",
+    "dev": "tsc -p ./plugins/tsconfig.json && tstl -p ./mod/tsconfig.json --watch",
     "lint": "eslint --ext .ts src --fix --max-warnings=0"
   },
   "author": "tamj0rd2",

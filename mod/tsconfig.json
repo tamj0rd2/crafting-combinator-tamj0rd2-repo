@@ -7,18 +7,13 @@
             "ESNext"
         ],
         "moduleResolution": "Node",
-        "types": [
-            "typed-factorio/prototype",
-            "typed-factorio/runtime",
-            "typed-factorio/settings",
-            "factorio-test",
-            "luassert-tstl"
-        ],
+        "typeRoots": [],
         "strict": true,
-        "outDir": ".release"
+        "outDir": "../.release"
     },
     "include": [
-        "src/**/*.ts"
+        "./types.d.ts",
+        "./src/**/*.ts"
     ],
     "tstl": {
         "luaTarget": "5.2",
