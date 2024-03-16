@@ -32,4 +32,12 @@ export class CraftingCombinators {
 		const unitNumber = assert(entity.unit_number)
 		this.craftingCombinators[unitNumber] = new CraftingCombinator(entity)
 	}
+
+	static handleEntityDestruction(unitNumber: UnitNumber) {
+		const combinator = this.craftingCombinators[unitNumber]
+		if (combinator === undefined) return
+
+		combinator.handleDestruction()
+		delete this.craftingCombinators[unitNumber]
+	}
 }

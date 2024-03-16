@@ -26,6 +26,16 @@ script.on_event(defines.events.script_raised_built, (event) => {
 	}
 }, [{filter: "name", name: constants.CRAFTING_COMBINATOR}])
 
+script.on_event([defines.events.on_entity_destroyed], (event) => {
+	if (event.unit_number === undefined) return
+	entities.CraftingCombinators.handleEntityDestruction(event.unit_number)
+})
+
+script.on_event([defines.events.script_raised_destroy], (event) => {
+	if (event.entity.unit_number === undefined) return
+	entities.CraftingCombinators.handleEntityDestruction(event.entity.unit_number)
+})
+
 script.on_nth_tick(10, () => {
 	entities.CraftingCombinators.updateAll()
 })

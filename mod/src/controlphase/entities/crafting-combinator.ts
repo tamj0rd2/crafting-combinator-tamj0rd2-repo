@@ -59,6 +59,10 @@ export class CraftingCombinator {
 
 		return otherEntity.force.recipes[thingToCraft]
 	}
+
+	handleDestruction() {
+		// TODO: delete the output entity
+	}
 }
 
 export class CraftingCombinatorOutput {

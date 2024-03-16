@@ -61,7 +61,7 @@ describe("basic crafting combinator functionality", () => {
 		])
 	})
 
-	test.only("deleting the assembling machine reset's the combinator's output", () => {
+	test("deleting the assembling machine reset's the combinator's output", () => {
 		const {
 			setConstantCombinatorSignal,
 			assertOutputSignal,
@@ -74,10 +74,30 @@ describe("basic crafting combinator functionality", () => {
 				assert: () => assertOutputSignal("pipe"),
 			},
 			{
-				act: () => removeAssemblingMachine(),
+				act: removeAssemblingMachine,
 				assert: () => {
 					assertOutputSignal(undefined)
 				}
+			},
+		])
+	})
+
+	// this is because I don't currently have a way to save the assemblers inputs/outputs. I don't want the player to lose them right now.
+	test.only("deleting the crafting combinator does not reset the assembling machine's recipe", () => {
+		const {
+			setConstantCombinatorSignal,
+			assertAssemblingMachineRecipe,
+			removeCraftingCombinator
+		} = setupTestingArea()
+
+		perform([
+			{
+				act: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
+				assert: () => assertAssemblingMachineRecipe("iron-stick"),
+			},
+			{
+				act: removeCraftingCombinator,
+				assert: () => assertAssemblingMachineRecipe("iron-stick"),
 			},
 		])
 	})
@@ -137,6 +157,8 @@ describe("basic crafting combinator functionality", () => {
 				assert.equal(expectedSignalName, circuitNetwork.signals?.[0]?.signal?.name)
 			},
 			removeAssemblingMachine: () => assemblingMachine.destroy({raise_destroy: true}),
+			// TODO: craftingCombinator could do with a remove or destroy method on it.
+			removeCraftingCombinator: () => craftingCombinator.entity.destroy({raise_destroy: true}),
 		}
 	}
 
