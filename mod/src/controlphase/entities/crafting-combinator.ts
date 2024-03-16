@@ -1,5 +1,6 @@
 import type {LuaConstantCombinatorControlBehavior, LuaEntity, SignalID} from "factorio:runtime"
 import constants from "../../constants"
+import helpers from "../helpers"
 
 /* This should be newed up via {@link CraftingCombinators} rather than here directly. Using this can lead to bugs */
 export class CraftingCombinator {
@@ -17,18 +18,11 @@ export class CraftingCombinator {
 	private _output: CraftingCombinatorOutput
 
 	update = () => {
-		// find nearby assembling machines
-		const assemblingMachines = this.entity.surface.find_entities_filtered({
-			position: this.entity.position,
-			// TODO: how can I set this to the width of the assembling machine? It might not always be 3.
-			//  ideally I should be checking whether an entity is adjacent to the combinator
-			radius: 3,
-			type: "assembling-machine"
-		})
+		const assemblingMachines = helpers.findEntitiesAdjacentTo(this.entity, {type: "assembling-machine"})
 
 		// TODO: maybe I can set some kind of indicator for when crafting combinator is near multiple assemblers.
 		// or... maybe it's not a problem if a crafting combinator is sandwiched between 2 machines. It should probably
-		// just set the recipe for both. Might be convenient for having pairs of assembling machines
+		// just set the recipe for both. Might be convenient for having pairs of assembling machines. Revisit later
 		if (assemblingMachines.length !== 1) {
 			this._output.resetSignal()
 			return
@@ -39,6 +33,9 @@ export class CraftingCombinator {
 
 		// TODO: what to do with any input items and output items currently inside of the assembling machine?
 		// TODO: I should let the assembling machine finish crafting before allowing the recipe to change.
+
+		// First implementation - I'll put the contents of the machine into a nearby chest.
+
 		assemblingMachine.set_recipe(recipe)
 		// TODO: don't hardcode item here. I think chemical plants count as crafting machines.
 		this._output.setSignal({type: "item", name: recipe?.name}, 1)

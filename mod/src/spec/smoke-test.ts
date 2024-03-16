@@ -1,14 +1,9 @@
 import constants from "../constants"
-import type {
-	LuaConstantCombinatorControlBehavior,
-	LuaEntity,
-	LuaSurface,
-	SignalID,
-	SurfaceCreateEntity
-} from "factorio:runtime"
+import type {LuaConstantCombinatorControlBehavior, LuaSurface, SignalID, SurfaceCreateEntity} from "factorio:runtime"
 import {perform} from "./async"
 
 import {CraftingCombinators} from "../controlphase/entities"
+import helpers from "../controlphase/helpers"
 
 describe("basic crafting combinator functionality", () => {
 	const nauvis = () => game.surfaces[1]
@@ -115,13 +110,13 @@ describe("basic crafting combinator functionality", () => {
 		})
 
 		const craftingCombinator = CraftingCombinators.create(nauvis(), {
-			position: translatePositionOf(assemblingMachine, 2, -1),
+			position: helpers.translatePositionOfEntity(assemblingMachine, 2, -1),
 			force: force(),
 		})
 
 		const smallElectricPole = createEntity(nauvis(), {
 			name: "small-electric-pole",
-			position: translatePositionOf(craftingCombinator.entity, 0, -2),
+			position: helpers.translatePositionOfEntity(craftingCombinator.entity, 0, -2),
 			force: force(),
 			raise_built: true,
 		})
@@ -133,7 +128,7 @@ describe("basic crafting combinator functionality", () => {
 
 		const constantCombinator = createEntity(nauvis(), {
 			name: "constant-combinator",
-			position: translatePositionOf(craftingCombinator.entity, 0, 1),
+			position: helpers.translatePositionOfEntity(craftingCombinator.entity, 0, 1),
 			force: force(),
 			raise_built: true,
 		})
@@ -178,6 +173,3 @@ describe("basic crafting combinator functionality", () => {
 	}
 })
 
-function translatePositionOf(entity: LuaEntity, x: number, y: number) {
-	return {x: entity.position.x + x, y: entity.position.y + y}
-}
