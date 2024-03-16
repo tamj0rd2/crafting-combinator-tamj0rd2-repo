@@ -1,4 +1,4 @@
-import type {LuaConstantCombinatorControlBehavior, LuaEntity, LuaRecipe, SignalID} from "factorio:runtime"
+import type {LuaConstantCombinatorControlBehavior, LuaEntity, SignalID} from "factorio:runtime"
 import constants from "../../constants"
 
 /* This should be newed up via {@link CraftingCombinators} rather than here directly. Using this can lead to bugs */
@@ -15,10 +15,6 @@ export class CraftingCombinator {
 	}
 
 	private _output: CraftingCombinatorOutput
-	private _recipe?: LuaRecipe = undefined
-	public get recipe(): LuaRecipe | undefined {
-		return this._recipe
-	}
 
 	update = () => {
 		// find nearby assembling machines
@@ -30,19 +26,16 @@ export class CraftingCombinator {
 			type: "assembling-machine"
 		})
 
+		// TODO: maybe I can set some kind of indicator for when crafting combinator is near multiple assemblers.
+		// or... maybe it's not a problem if a crafting combinator is sandwiched between 2 machines. It should probably
+		// just set the recipe for both. Might be convenient for having pairs of assembling machines
 		if (assemblingMachines.length !== 1) {
-			// TODO: if there are no assembling machines nearby, I should probably reset the combinator's output
-			// TODO: maybe I can set some kind of indicator for when crafting combinator is near multiple assemblers.
-			// or... maybe it's not a problem if a crafting combinator is sandwiched between 2 machines. It should probably
-			// just set the recipe for both. Might be convenient for having pairs of assembling machines
+			this._output.resetSignal()
+			return
 		}
 
 		const assemblingMachine = assemblingMachines[0]
 		const recipe = this.chooseARecipeToCraftFor(assemblingMachine)
-
-		// TODO: persist the recipe somewhere - needs to be in global to work between saves
-		//   actually, i may not need to put it in global. if there's an incoming circuit connection, that's enough to figure it out
-		this._recipe = recipe
 
 		// TODO: what to do with any input items and output items currently inside of the assembling machine?
 		// TODO: I should let the assembling machine finish crafting before allowing the recipe to change.
@@ -82,8 +75,14 @@ export class CraftingCombinatorOutput {
 		})
 	}
 
+	// TODO: make a variable for the cb
 	setSignal = (signal: SignalID, count: number) => {
 		const cb = this.entity.get_or_create_control_behavior()! as LuaConstantCombinatorControlBehavior
 		cb.parameters = [{index: 1, signal, count}]
+	}
+
+	resetSignal = () => {
+		const cb = this.entity.get_or_create_control_behavior()! as LuaConstantCombinatorControlBehavior
+		cb.parameters = []
 	}
 }

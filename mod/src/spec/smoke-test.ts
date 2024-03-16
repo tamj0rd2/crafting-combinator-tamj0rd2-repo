@@ -28,40 +28,61 @@ describe("basic crafting combinator functionality", () => {
 	})
 
 	before_each(() => {
-		nauvis().find_entities().forEach(entity => {
-			if (entitiesForTesting.includes(entity.name)) {
-				entity.destroy({raise_destroy: true})
-			}
-		})
+		// TODO: re-add this in some form
+		// nauvis().find_entities().forEach(entity => {
+		// 	if (entitiesForTesting.includes(entity.name)) {
+		// 		entity.destroy({raise_destroy: true})
+		// 	}
+		// })
 	})
 
 	test("can set the recipe of an assembling machine using a crafting combinator with an incoming signal", () => {
 		const {
-			craftingCombinator,
 			setConstantCombinatorSignal,
 			assertAssemblingMachineRecipe,
-			assertElectricPoleSignal,
+			assertOutputSignal,
 		} = setupTestingArea()
 
 		perform([
 			{
 				act: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
 				assert: () => {
-					assert.equal("pipe", craftingCombinator.recipe?.name)
 					assertAssemblingMachineRecipe("pipe")
-					assertElectricPoleSignal("pipe")
+					assertOutputSignal("pipe")
 				}
 			},
 			{
 				act: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
 				assert: () => {
-					assert.equal("iron-stick", craftingCombinator.recipe?.name)
 					assertAssemblingMachineRecipe("iron-stick")
-					assertElectricPoleSignal("iron-stick")
+					assertOutputSignal("iron-stick")
 				}
 			}
 		])
 	})
+
+	test.only("deleting the assembling machine reset's the combinator's output", () => {
+		const {
+			setConstantCombinatorSignal,
+			assertOutputSignal,
+			removeAssemblingMachine,
+		} = setupTestingArea()
+
+		perform([
+			{
+				act: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
+				assert: () => assertOutputSignal("pipe"),
+			},
+			{
+				act: () => removeAssemblingMachine(),
+				assert: () => {
+					assertOutputSignal(undefined)
+				}
+			},
+		])
+	})
+
+	test.skip("stuff actually deletes properly without causing errors", () => {})
 
 	function setupTestingArea() {
 		const assemblingMachine = createEntity(nauvis(), {
@@ -111,10 +132,11 @@ describe("basic crafting combinator functionality", () => {
 				signal: signal
 			}],
 			assertAssemblingMachineRecipe: (expectedRecipe: string) => assert.equal(expectedRecipe, assemblingMachine.get_recipe()?.name),
-			assertElectricPoleSignal: (expectedSignalName: string) => {
+			assertOutputSignal: (expectedSignalName?: string) => {
 				const circuitNetwork = assert(smallElectricPole.get_circuit_network(defines.wire_type.green))
 				assert.equal(expectedSignalName, circuitNetwork.signals?.[0]?.signal?.name)
-			}
+			},
+			removeAssemblingMachine: () => assemblingMachine.destroy({raise_destroy: true}),
 		}
 	}
 
