@@ -61,12 +61,12 @@ export class CraftingCombinator {
 	}
 
 	handleDestruction() {
-		// TODO: delete the output entity
+		this._output.destroy()
 	}
 }
 
 export class CraftingCombinatorOutput {
-	constructor(readonly entity: LuaEntity, parent: CraftingCombinator) {
+	constructor(private readonly entity: LuaEntity, parent: CraftingCombinator) {
 		assert(entity.name === constants.CRAFTING_COMBINATOR_OUTPUT, "entity must be a crafting combinator output")
 		assert(entity.valid, "entity must be valid")
 
@@ -88,5 +88,9 @@ export class CraftingCombinatorOutput {
 	resetSignal = () => {
 		const cb = this.entity.get_or_create_control_behavior()! as LuaConstantCombinatorControlBehavior
 		cb.parameters = []
+	}
+
+	destroy = () => {
+		assert(this.entity.destroy(), "failed to destroy crafting combinator output")
 	}
 }

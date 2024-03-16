@@ -26,12 +26,27 @@ script.on_event(defines.events.script_raised_built, (event) => {
 	}
 }, [{filter: "name", name: constants.CRAFTING_COMBINATOR}])
 
+script.on_event([
+	defines.events.on_built_entity,
+	defines.events.on_robot_built_entity,
+], (event) => {
+	switch (event.created_entity.name) {
+	case constants.CRAFTING_COMBINATOR:
+		return entities.CraftingCombinators.registerExistingEntity(event.created_entity)
+	}
+})
+
+
 script.on_event([defines.events.on_entity_destroyed], (event) => {
 	if (event.unit_number === undefined) return
 	entities.CraftingCombinators.handleEntityDestruction(event.unit_number)
 })
 
-script.on_event([defines.events.script_raised_destroy], (event) => {
+script.on_event([
+	defines.events.on_player_mined_entity,
+	defines.events.on_robot_mined_entity,
+	defines.events.script_raised_destroy
+], (event) => {
 	if (event.entity.unit_number === undefined) return
 	entities.CraftingCombinators.handleEntityDestruction(event.entity.unit_number)
 })

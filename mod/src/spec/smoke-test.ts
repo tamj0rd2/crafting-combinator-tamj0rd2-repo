@@ -8,7 +8,7 @@ import type {
 } from "factorio:runtime"
 import {perform} from "./async"
 
-import {CraftingCombinators} from "../controlphase/entities/crafting-combinators"
+import {CraftingCombinators} from "../controlphase/entities"
 
 describe("basic crafting combinator functionality", () => {
 	const nauvis = () => game.surfaces[1]
@@ -21,38 +21,39 @@ describe("basic crafting combinator functionality", () => {
 		"small-electric-pole",
 	]
 
+	function deleteTestingEntities() {
+		const entities = nauvis().find_entities_filtered({ name: entitiesForTesting })
+		for (const entity of entities) {
+			if (entity.valid) assert(entity.destroy({raise_destroy: true}))
+		}
+	}
+
 	before_all(() => {
+		deleteTestingEntities()
 		nauvis().always_day = true
 		player().cheat_mode = true
 		player().force.research_all_technologies()
 	})
 
-	before_each(() => {
-		// TODO: re-add this in some form
-		// nauvis().find_entities().forEach(entity => {
-		// 	if (entitiesForTesting.includes(entity.name)) {
-		// 		entity.destroy({raise_destroy: true})
-		// 	}
-		// })
-	})
+	before_each(deleteTestingEntities)
 
 	test("can set the recipe of an assembling machine using a crafting combinator with an incoming signal", () => {
 		const {
-			setConstantCombinatorSignal,
+			setConstantCombinatorInputSignal,
 			assertAssemblingMachineRecipe,
 			assertOutputSignal,
 		} = setupTestingArea()
 
 		perform([
 			{
-				act: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
+				act: () => setConstantCombinatorInputSignal({type: "item", name: "pipe"}),
 				assert: () => {
 					assertAssemblingMachineRecipe("pipe")
 					assertOutputSignal("pipe")
 				}
 			},
 			{
-				act: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
+				act: () => setConstantCombinatorInputSignal({type: "item", name: "iron-stick"}),
 				assert: () => {
 					assertAssemblingMachineRecipe("iron-stick")
 					assertOutputSignal("iron-stick")
@@ -61,48 +62,49 @@ describe("basic crafting combinator functionality", () => {
 		])
 	})
 
-	test("deleting the assembling machine reset's the combinator's output", () => {
+	test("deleting the assembling machine resets the combinator's output", () => {
 		const {
-			setConstantCombinatorSignal,
+			setConstantCombinatorInputSignal,
 			assertOutputSignal,
 			removeAssemblingMachine,
 		} = setupTestingArea()
 
 		perform([
 			{
-				act: () => setConstantCombinatorSignal({type: "item", name: "pipe"}),
+				act: () => setConstantCombinatorInputSignal({type: "item", name: "pipe"}),
 				assert: () => assertOutputSignal("pipe"),
 			},
 			{
 				act: removeAssemblingMachine,
-				assert: () => {
-					assertOutputSignal(undefined)
-				}
+				assert: () => assertOutputSignal(undefined)
 			},
 		])
 	})
 
-	// this is because I don't currently have a way to save the assemblers inputs/outputs. I don't want the player to lose them right now.
-	test.only("deleting the crafting combinator does not reset the assembling machine's recipe", () => {
+	// these are because I don't currently have a way to save the assemblers inputs/outputs. I don't want the player to lose them right now.
+	test.todo("when the input signal is lost, the assembling machine's recipe is not reset")
+	test("deleting the crafting combinator does not reset the assembling machine's recipe", () => {
 		const {
-			setConstantCombinatorSignal,
+			setConstantCombinatorInputSignal,
 			assertAssemblingMachineRecipe,
-			removeCraftingCombinator
+			removeCraftingCombinator,
+			assertCombinatorIsGone
 		} = setupTestingArea()
 
 		perform([
 			{
-				act: () => setConstantCombinatorSignal({type: "item", name: "iron-stick"}),
+				act: () => setConstantCombinatorInputSignal({type: "item", name: "iron-stick"}),
 				assert: () => assertAssemblingMachineRecipe("iron-stick"),
 			},
 			{
 				act: removeCraftingCombinator,
-				assert: () => assertAssemblingMachineRecipe("iron-stick"),
+				assert: () => {
+					assertCombinatorIsGone()
+					assertAssemblingMachineRecipe("iron-stick")
+				},
 			},
 		])
 	})
-
-	test.skip("stuff actually deletes properly without causing errors", () => {})
 
 	function setupTestingArea() {
 		const assemblingMachine = createEntity(nauvis(), {
@@ -144,9 +146,8 @@ describe("basic crafting combinator functionality", () => {
 
 		const constantCombinatorCb = constantCombinator.get_or_create_control_behavior() as LuaConstantCombinatorControlBehavior
 		return {
-			craftingCombinator,
 			// TODO: this makes me want to build my own abstraction on top of these entities
-			setConstantCombinatorSignal: (signal: SignalID) => constantCombinatorCb.parameters = [{
+			setConstantCombinatorInputSignal: (signal: SignalID) => constantCombinatorCb.parameters = [{
 				count: 1,
 				index: 1,
 				signal: signal
@@ -155,6 +156,10 @@ describe("basic crafting combinator functionality", () => {
 			assertOutputSignal: (expectedSignalName?: string) => {
 				const circuitNetwork = assert(smallElectricPole.get_circuit_network(defines.wire_type.green))
 				assert.equal(expectedSignalName, circuitNetwork.signals?.[0]?.signal?.name)
+			},
+			assertCombinatorIsGone: () => {
+				const entities = nauvis().find_entities_filtered({ name: [constants.CRAFTING_COMBINATOR, constants.CRAFTING_COMBINATOR_OUTPUT] })
+				assert.equal(0, entities.length, "Expected all crafting combinators to be gone")
 			},
 			removeAssemblingMachine: () => assemblingMachine.destroy({raise_destroy: true}),
 			// TODO: craftingCombinator could do with a remove or destroy method on it.
