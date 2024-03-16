@@ -17,3 +17,16 @@ To determine what the item to craft is, the crafting combinator will need to:
 - make sure the assembling machine is actually capable of building the item
 - choose the item that's most in demand. There may need to be sticky behaviour to prevent the combinator from constantly switching between two items that have similar demand
 - it should only craft things that have been researched
+
+## Troubleshooting weird test failures
+
+Create a test function that does nothing except setup the testing area. If it fails, something odd
+is probably happening related to cleanup between tests.
+
+Exmaple:
+
+```typescript
+test("something", () => {
+  setupTestArea()
+})
+```

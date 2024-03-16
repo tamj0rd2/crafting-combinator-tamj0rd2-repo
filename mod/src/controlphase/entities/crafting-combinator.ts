@@ -29,13 +29,12 @@ export class CraftingCombinator {
 		}
 
 		const assemblingMachine = assemblingMachines[0]
+		if (assemblingMachine.is_crafting()) return
+
 		const recipe = this.chooseARecipeToCraftFor(assemblingMachine)
 
 		// TODO: what to do with any input items and output items currently inside of the assembling machine?
 		// TODO: I should let the assembling machine finish crafting before allowing the recipe to change.
-
-		// First implementation - I'll put the contents of the machine into a nearby chest.
-
 		assemblingMachine.set_recipe(recipe)
 		// TODO: don't hardcode item here. I think chemical plants count as crafting machines.
 		this._output.setSignal({type: "item", name: recipe?.name}, 1)

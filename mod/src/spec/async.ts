@@ -1,5 +1,6 @@
 interface AsyncStep {
 	act: () => void
+	tickDelayBeforeAssert?: number
 	assert: () => void
 }
 
@@ -10,11 +11,11 @@ export function perform(steps: AsyncStep[]): void {
 			return () => undefined
 		}
 
-		const { act, assert } = steps[stepIndex]
+		const { act, assert, tickDelayBeforeAssert } = steps[stepIndex]
 
 		return () => {
 			act()
-			after_ticks(60, () => {
+			after_ticks(tickDelayBeforeAssert ?? 60, () => {
 				assert()
 				fnForStep(stepIndex + 1)()
 			})
