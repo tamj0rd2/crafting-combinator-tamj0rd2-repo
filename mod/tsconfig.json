@@ -17,10 +17,16 @@
     ],
     "tstl": {
         "luaTarget": "5.2",
+        "buildMode": "default",
         "noHeader": true,
         "luaLibImport": "require-minimal",
         "noResolvePaths": [
             "__factorio-test__.init",
+        ],
+        "luaPlugins": [
+            {
+                "name": "../.plugins/improveLuaLibImports.cjs"
+            }
         ],
         "noImplicitSelf": true,
         "sourceMapTraceback": true

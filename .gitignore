@@ -1,6 +1,7 @@
 node_modules/
 .run
 .release
+.plugins
 .factorio-test-data
 .envrc
 .idea
