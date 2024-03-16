@@ -9,6 +9,7 @@ linked_folder="${repo_dir:?}/.factorio-test-data/mods/crafting-combinator-tamj0r
 rm -rf "${mod_dir:?}"/*
 npm run build
 cp mod/mod_info.json "${mod_dir}/info.json"
+cp -r mod/locale "${mod_dir}"
 
 mkdir -p ".factorio-test-data/mods"
 
