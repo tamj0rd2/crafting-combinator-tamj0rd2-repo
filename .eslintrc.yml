@@ -27,4 +27,11 @@ rules:
   semi:
     - error
     - never
+  no-duplicate-imports: "error"
   "@typescript-eslint/strict-boolean-expressions": "error"
+  "@typescript-eslint/consistent-type-imports":
+    - error
+    - {
+      prefer: 'type-imports',
+      fixStyle: 'inline-type-imports',
+    }

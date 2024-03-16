@@ -1,2 +1,4 @@
-export const CRAFTING_COMBINATOR = "crafting-combinator"
-export const CRAFTING_COMBINATOR_OUTPUT = "crafting-combinator-output"
+export default {
+	CRAFTING_COMBINATOR: "crafting-combinator",
+	CRAFTING_COMBINATOR_OUTPUT: "crafting-combinator-output",
+}

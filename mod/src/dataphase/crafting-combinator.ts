@@ -1,20 +1,20 @@
-import {table} from "util"
-import {CRAFTING_COMBINATOR, CRAFTING_COMBINATOR_OUTPUT} from "../constants"
-import {ConstantCombinatorPrototype, ItemPrototype} from "factorio:prototype"
+import * as util from "util"
+import constants from "../constants"
+import {type ConstantCombinatorPrototype, type ItemPrototype} from "factorio:prototype"
 
 const craftingCombinator = {
-	...table.deepcopy(data.raw["decider-combinator"]["decider-combinator"])!,
-	name: CRAFTING_COMBINATOR,
+	...util.table.deepcopy(data.raw["decider-combinator"]["decider-combinator"])!,
+	name: constants.CRAFTING_COMBINATOR,
 }
 
 const craftingCombinatorItem: ItemPrototype = {
-	...table.deepcopy(data.raw.item["decider-combinator"])!,
-	name: CRAFTING_COMBINATOR
+	...util.table.deepcopy(data.raw.item["decider-combinator"])!,
+	name: constants.CRAFTING_COMBINATOR
 }
 
 const craftingCombinatorOutput: ConstantCombinatorPrototype = {
-	...table.deepcopy(data.raw["constant-combinator"]["constant-combinator"])!,
-	name: CRAFTING_COMBINATOR_OUTPUT,
+	...util.table.deepcopy(data.raw["constant-combinator"]["constant-combinator"])!,
+	name: constants.CRAFTING_COMBINATOR_OUTPUT,
 	flags: [
 		"placeable-off-grid",
 		"hidden",

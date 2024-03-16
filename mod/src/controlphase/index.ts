@@ -1,10 +1,10 @@
-import {CraftingCombinator, CraftingCombinatorOutput, CraftingCombinators} from "./entities/crafting-combinator"
-import {CRAFTING_COMBINATOR} from "../constants"
+import * as entities from "./entities"
+import constants from "../constants"
 
 const customTypes = [
-	CraftingCombinators,
-	CraftingCombinator,
-	CraftingCombinatorOutput
+	entities.CraftingCombinators,
+	entities.CraftingCombinator,
+	entities.CraftingCombinatorOutput,
 ]
 
 customTypes.forEach((customType) => {
@@ -21,11 +21,11 @@ script.on_init(() => {
 
 script.on_event(defines.events.script_raised_built, (event) => {
 	switch (event.entity.name) {
-	case CRAFTING_COMBINATOR:
-		return CraftingCombinators.registerExistingEntity(event.entity)
+	case constants.CRAFTING_COMBINATOR:
+		return entities.CraftingCombinators.registerExistingEntity(event.entity)
 	}
-}, [{filter: "name", name: CRAFTING_COMBINATOR}])
+}, [{filter: "name", name: constants.CRAFTING_COMBINATOR}])
 
 script.on_nth_tick(10, () => {
-	CraftingCombinators.updateAll()
+	entities.CraftingCombinators.updateAll()
 })

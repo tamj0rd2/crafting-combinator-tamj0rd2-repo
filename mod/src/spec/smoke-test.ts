@@ -1,5 +1,5 @@
-import {CRAFTING_COMBINATOR} from "../constants"
-import {
+import constants from "../constants"
+import type {
 	LuaConstantCombinatorControlBehavior,
 	LuaEntity,
 	LuaSurface,
@@ -7,7 +7,8 @@ import {
 	SurfaceCreateEntity
 } from "factorio:runtime"
 import {perform} from "./async"
-import {CraftingCombinators} from "../controlphase/entities/crafting-combinator"
+
+import {CraftingCombinators} from "../controlphase/entities/crafting-combinators"
 
 describe("basic crafting combinator functionality", () => {
 	const nauvis = () => game.surfaces[1]
@@ -15,7 +16,7 @@ describe("basic crafting combinator functionality", () => {
 	const force = () => game.forces.player
 	const entitiesForTesting = [
 		"assembling-machine-1",
-		CRAFTING_COMBINATOR,
+		constants.CRAFTING_COMBINATOR,
 		"constant-combinator",
 		"small-electric-pole",
 	]

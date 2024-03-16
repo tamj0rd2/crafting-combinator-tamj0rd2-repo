@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc -p ./plugins/tsconfig.json && tstl -p ./mod/tsconfig.json",
     "dev": "tsc -p ./plugins/tsconfig.json && tstl -p ./mod/tsconfig.json --watch",
-    "lint": "eslint --ext .ts src --fix --max-warnings=0"
+    "lint": "eslint --ext .ts mod --fix --max-warnings=0"
   },
   "author": "tamj0rd2",
   "license": "MIT",

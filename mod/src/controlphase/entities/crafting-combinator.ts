@@ -1,54 +1,14 @@
-import {
-	LuaConstantCombinatorControlBehavior,
-	LuaEntity,
-	LuaRecipe,
-	LuaSurface,
-	SignalID,
-	SurfaceCreateEntity,
-	UnitNumber
-} from "factorio:runtime"
-import {CRAFTING_COMBINATOR, CRAFTING_COMBINATOR_OUTPUT} from "../../constants"
-
-declare const global: {
-	craftingCombinators: Record<UnitNumber, CraftingCombinator>
-}
-
-export class CraftingCombinators {
-	static init() {
-		global.craftingCombinators = global.craftingCombinators ?? {}
-	}
-
-	private static get craftingCombinators(): Record<UnitNumber, CraftingCombinator> {
-		return global.craftingCombinators
-	}
-
-	static updateAll() {
-		Object.values(this.craftingCombinators).forEach(combinator => combinator.update())
-	}
-
-	static create(surface: LuaSurface, params: Omit<SurfaceCreateEntity, "name" | "raise_built">) {
-		const entity = assert(surface.create_entity({
-			...params, name: CRAFTING_COMBINATOR,
-			raise_built: true
-		}))
-		assert(entity.valid)
-		return this.craftingCombinators[assert(entity.unit_number)]
-	}
-
-	static registerExistingEntity(entity: LuaEntity) {
-		const unitNumber = assert(entity.unit_number)
-		this.craftingCombinators[unitNumber] = new CraftingCombinator(entity)
-	}
-}
+import type {LuaConstantCombinatorControlBehavior, LuaEntity, LuaRecipe, SignalID} from "factorio:runtime"
+import constants from "../../constants"
 
 /* This should be newed up via {@link CraftingCombinators} rather than here directly. Using this can lead to bugs */
 export class CraftingCombinator {
 	constructor(readonly entity: LuaEntity) {
-		assert(entity.name === CRAFTING_COMBINATOR, "entity must be a crafting combinator")
+		assert(entity.name === constants.CRAFTING_COMBINATOR, "entity must be a crafting combinator")
 		assert(entity.valid, "entity must be valid")
 
 		this._output = new CraftingCombinatorOutput(assert(entity.surface.create_entity({
-			name: CRAFTING_COMBINATOR_OUTPUT,
+			name: constants.CRAFTING_COMBINATOR_OUTPUT,
 			position: entity.position,
 			force: entity.force
 		})), this)
@@ -110,7 +70,7 @@ export class CraftingCombinator {
 
 export class CraftingCombinatorOutput {
 	constructor(readonly entity: LuaEntity, parent: CraftingCombinator) {
-		assert(entity.name === CRAFTING_COMBINATOR_OUTPUT, "entity must be a crafting combinator output")
+		assert(entity.name === constants.CRAFTING_COMBINATOR_OUTPUT, "entity must be a crafting combinator output")
 		assert(entity.valid, "entity must be valid")
 
 		;[defines.wire_type.green, defines.wire_type.red].forEach(wireType => {
